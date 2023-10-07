@@ -26,12 +26,13 @@ $(document).ready(function () {
   function checkAPIStatus () {
     $.get('http://0.0.0.0:5001/api/v1/status/', function (data) {
       if (data.status === 'OK') {
-        $('div#api_status').addClass('available');
+        if (!$('div#api_status').hasClass('available')) {
+          $('div#api_status').addClass('available');
+        }
       } else {
         $('div#api_status').removeClass('available');
       }
     });
   }
   checkAPIStatus();
-  setInterval(checkAPIStatus, 5000);
 });
