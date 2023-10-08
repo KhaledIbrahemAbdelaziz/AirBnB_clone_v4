@@ -1,24 +1,22 @@
 const $ = window.$;
+
 $(document).ready(function () {
   const amenityIds = {};
 
   $('input[type="checkbox"]').change(function () {
     const checkbox = $(this);
-    const amenId = checkbox.data('amenity-id');
+    const amenId = checkbox.data('amenity_id');
 
     if (checkbox.is(':checked')) {
-      amenityIds.push(amenId);
+      amenityIds[amenId] = true;
     } else {
-      const index = amenityIds.indexOf(amenId);
-      if (index !== -1) {
-        amenityIds.splice(index, 1);
-      }
+      delete amenityIds[amenId];
     }
     const amenHeader = $('div.amenities h4');
-    if (amenityIds.length === 0) {
-      amenHeader.text('\u00A0');
+    if (Object.keys(amenityIds).length === 0) {
+      amenHeader.text('&nbsp');
     } else {
-      amenHeader.text(amenityIds.join(', '));
+      amenHeader.text(Object.keys(amenityIds).join(', '));
     }
   });
 });
