@@ -8,18 +8,15 @@ $(document).ready(function () {
     const amenId = checkbox.data('amenity-id');
 
     if (checkbox.is(':checked')) {
-      amenityIds.push(amenId);
+      amenityIds[amenId] = true;
     } else {
-      const index = amenityIds.indexOf(amenId);
-      if (index !== -1) {
-        amenityIds.splice(index, 1);
-      }
+      delete amenityIds[amenId];
     }
     const amenHeader = $('div.amenities h4');
-    if (amenityIds.length === 0) {
+    if (Object.keys(amenityIds).length === 0) {
       amenHeader.text('\u00A0');
     } else {
-      amenHeader.text(amenityIds.join(', '));
+      amenHeader.text(Object.keys(amenityIds).join(', '));
     }
   });
 
