@@ -5,21 +5,19 @@ $(document).ready(function () {
 
   $('input[type="checkbox"]').change(function () {
     const checkbox = $(this);
-    const amenId = checkbox.data('amenity-id');
+    const amenId = checkbox.data('amenity_id');
 
     if (checkbox.is(':checked')) {
-      amenityIds.push(amenId);
+      amenityIds[amenId] = true;
     } else {
-      const index = amenityIds.indexOf(amenId);
-      if (index !== -1) {
-        amenityIds.splice(index, 1);
-      }
+      delete amenityIds[amenId];
     }
     const amenHeader = $('div.amenities h4');
-    if (amenityIds.length === 0) {
-      amenHeader.text('\u00A0');
+    if (Object.keys(amenityIds).length === 0) {
+      amenHeader.text('&nbsp');
+    );
     } else {
-      amenHeader.text(amenityIds.join(', '));
+      amenHeader.text(Object.keys(amenityIds).join(', '));
     }
   });
 
@@ -34,37 +32,52 @@ $(document).ready(function () {
       }
     });
   }
-  checkAPIStatus();
-});
 
-  function search_All_Places () {
-	  const url = `http://0.0.0.0:5001/api/v1/places_search/`;
-	  $.post(url, {
-		  heaaders: { "Content-Type": "application/json" },
-		  data: JSON.stringify({ amenities: Object.values(amenityObj) })},
-		  function (data) {
-			  $("section.places").empty();
-			  for (const d of data) {
-				  const art = [
-					  "<article>",
-					  "<div class="title_box">",
-					  "<h2>${d.name}</h2>",
-					  "<div class="price_by_night">$${d.price_by_night}</div>",
-					  "</div>",
-					  "<div class="information">",
-					  "<div class="max_guest">${d.max_guest} Guest</div>",
-					  "<div class="number_rooms">${d.number_rooms} Bedroom</div>",
-					  "<div class="number_bathrooms">${d.number_bathrooms} Bathroom</div>",
-					  "</div>",
-					  "<div class="description">",
-					  "${d.description}",
-					  "</div>",
-					  "</article>"
-				  ];
-				  $("section.places").append(art.join(""));
-			  }
-		  },
-		  function (err) {
-			  console.log(err);
-		  });
+  function getAllPlaces () {
+    const url = 'http://0.0.0.0:5001/api/v1/places_search/';
+    $.ajax({
+      url,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({}),
+      success: function (data) {
+        for (const p of data) {
+          const article = `
+            <article>
+            <div class="title_box">
+            <h2>${p.name}</h2>
+            <div class="price_by_night">$${p.price_by_night}</div>
+            </div>
+            <div class="information">
+            <div class="max_guest">${p.max_guest} Guest</div>
+            <div class="number_rooms">${p.number_rooms} Bedroom</div>
+            <div class="number_bathrooms">${p.number_bathrooms} Bathroom</div>
+            </div>
+            <div class="description">${p.description}</div>
+            </article>`;
+          $('section.places').append(article);
+        }
+      },
+      error: function (err) {
+        console.log(err);
+      }
+    });
   }
+  
+  $('button').click(function () {
+    const selectedAmen = Object.keys(amenityIds);
+    
+    $.ajax({
+      url: 'http://0.0.0.0:5001/api/v1/places_search/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ amenities: selectedAmen }),
+      success: function (data){},
+      error: function (err) {
+        console.log(err);
+        }
+      });
+  });
+  checkAPIStatus();
+  getAllPlaces();
+});
