@@ -35,12 +35,11 @@ $(document).ready(function () {
     });
   }
   checkAPIStatus();
-});
-
+  
   function Get_All_Places () {
-	  const url = `http://0.0.0.0:5001/api/v1/places_search/`;
-	  $.post(url, {
-		  heaaders: { "Content-Type": "application/json" },
+    const url = `http://0.0.0.0:5001/api/v1/places_search/`;
+    $.post(url, {
+		  headers: { "Content-Type": "application/json" },
 		  data: JSON.stringify({})},
 		  function (data) {
 			  for (const d of data) {
@@ -67,4 +66,5 @@ $(document).ready(function () {
 			  console.log(err);
 		  });
   }
-
+  Get_All_Places();
+});
