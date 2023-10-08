@@ -14,7 +14,8 @@ $(document).ready(function () {
     }
     const amenHeader = $('div.amenities h4');
     if (Object.keys(amenityIds).length === 0) {
-      amenHeader.text('\u00A0');
+      amenHeader.text(&nbsp);
+    );
     } else {
       amenHeader.text(Object.keys(amenityIds).join(', '));
     }
