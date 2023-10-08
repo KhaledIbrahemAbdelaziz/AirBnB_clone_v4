@@ -5,7 +5,7 @@ $(document).ready(function () {
 
   $('input[type="checkbox"]').change(function () {
     const checkbox = $(this);
-    const amenId = checkbox.data('amenity-id');
+    const amenId = checkbox.data('amenity_id');
 
     if (checkbox.is(':checked')) {
       amenityIds[amenId] = true;
