@@ -3,8 +3,10 @@ const $ = window.$;
 $(document).ready(function () {
   const amenityIDs = [];
   const myUrl = 'http://0.0.0.0:5001/api/v1';
+  const stateIds = [];
+  const cityIds = [];
 
-  $('input[type="checkbox"]').change(function () {
+  $('.amenities input[type="checkbox"]').change(function () {
     const checkbox = $(this);
     const amenityID = checkbox.attr('data-id');
     const amenityName = checkbox.attr('data-name');
@@ -29,6 +31,7 @@ $(document).ready(function () {
       amenitiesHeader.text(amenityNames.join(', '));
     }
   });
+  $('.locations 
 
   function checkAPIStatus () {
     $.get(myUrl + '/status/', function (data) {
