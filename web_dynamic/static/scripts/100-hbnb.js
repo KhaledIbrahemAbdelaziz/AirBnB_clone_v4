@@ -77,7 +77,6 @@ $(document).ready(function () {
     amenityIdDict.amenities = amenitysId;
     amenityIdDict.states = state;
     amenityIdDict.cities = city;
-    console.log(amenityIdDict);
     const url = myUrl + '/places_search/';
     $.ajax({
       url,
