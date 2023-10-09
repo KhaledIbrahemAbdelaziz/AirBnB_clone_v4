@@ -22,10 +22,10 @@ $(document).ready(function () {
 
     const amenitiesHeader = $('div.amenities h4');
     if (Object.keys(amenityIDs).length === 0) {
-      amenitiesHeader.text('&nbsp');
+      amenitiesHeader.html('&nbsp');
     } else {
       const amenityNames = amenityIDs.map(item => item.name);
-      amenitiesHeader.text(amenityNames.join(', '));
+      amenitiesHeader.html(amenityNames.join(', '));
     }
   });
   function checkAPIStatus () {

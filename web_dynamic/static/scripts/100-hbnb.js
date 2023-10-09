@@ -24,14 +24,41 @@ $(document).ready(function () {
     }
 
     const amenitiesHeader = $('div.amenities h4');
-    if (Object.keys(amenityIDs).length === 0) {
-      amenitiesHeader.text('&nbsp');
+    const amenityNames = amenityIDs.map(item => item.name);
+    amenitiesHeader.html(Object.keys(amenityIDs).length === 0 ? '&nbsp;' : amenityNames.join(', '));
+  });
+  $('.locations h2 input[type="checkbox"]').change(function () {
+    const stateCheckbox = $(this);
+    const stateId = stateCheckbox.attr('data-id');
+    const stateName = stateCheckbox.attr('data-name');
+
+    if (stateCheckbox.is(':checked')) {
+      stateIds.push({
+        id: stateId,
+        name: stateName
+      });
     } else {
-      const amenityNames = amenityIDs.map(item => item.name);
-      amenitiesHeader.text(amenityNames.join(', '));
+      const index = stateIds.findIndex(item => item.id === stateId);
+      if (index !== -1) { stateIds.splice(index, 1); }
+    }
+    const stateHeader = $('div.locations h4');
+    const sNames = stateIds.map(n => n.name);
+    stateHeader.html(Object.keys(stateIds).length === 0 ? '&nbsp;' : sNames.join(', '));
+  });
+  $('.locations .city_locations input[type="checkbox"]').change(function () {
+    const cityCheckbox = $(this);
+    const cityId = cityCheckbox.attr('data-id');
+    const cityName = cityCheckbox.attr('data-name');
+    if (cityCheckbox.is(':checked')) {
+      cityIds.push({
+        id: cityId,
+        name: cityName
+      });
+    } else {
+      const index = cityIds.findIndex(item => item.id === cityId);
+      if (index !== -1) { cityIds.splice(index, 1); }
     }
   });
-  $('.locations 
 
   function checkAPIStatus () {
     $.get(myUrl + '/status/', function (data) {
@@ -45,11 +72,12 @@ $(document).ready(function () {
     });
   }
 
-  function getAllPlaces (amenitysId) {
+  function getAllPlaces (amenitysId, city, state) {
     const amenityIdDict = {};
-    if (amenitysId) {
-      amenityIdDict.amenities = amenitysId;
-    }
+    amenityIdDict.amenities = amenitysId;
+    amenityIdDict.states = state;
+    amenityIdDict.cities = city;
+    console.log(amenityIdDict);
     const url = myUrl + '/places_search/';
     $.ajax({
       url,
@@ -95,7 +123,9 @@ $(document).ready(function () {
   $('button').click(function () {
     $('section.places article').remove();
     const selectedIds = amenityIDs.map(items => items.id);
-    getAllPlaces(selectedIds);
+    const selectedCities = cityIds.map(items => items.id);
+    const selectedStates = stateIds.map(items => items.id);
+    getAllPlaces(selectedIds, selectedCities, selectedStates);
   });
 
   checkAPIStatus();
