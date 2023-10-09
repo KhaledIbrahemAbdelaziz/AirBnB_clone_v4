@@ -2,6 +2,7 @@ const $ = window.$;
 
 $(document).ready(function () {
   const amenityIDs = [];
+  const myUrl = 'http://0.0.0.0:5001/api/v1';
 
   $('input[type="checkbox"]').change(function () {
     const checkbox = $(this);
@@ -30,7 +31,7 @@ $(document).ready(function () {
   });
 
   function checkAPIStatus () {
-    $.get('http://0.0.0.0:5001/api/v1/status/', function (data) {
+    $.get(myUrl + '/status/', function (data) {
       if (data.status === 'OK') {
         if (!$('div#api_status').hasClass('available')) {
           $('div#api_status').addClass('available');
@@ -41,29 +42,47 @@ $(document).ready(function () {
     });
   }
 
-  function getAllPlaces () {
-    const url = 'http://0.0.0.0:5001/api/v1/places_search/';
+  function getAllPlaces (amenitysId) {
+    const amenityIdDict = {};
+    if (amenitysId) {
+      amenityIdDict.amenities = amenitysId;
+    }
+    const url = myUrl + '/places_search/';
     $.ajax({
       url,
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({}),
+      data: JSON.stringify(amenityIdDict),
       success: function (data) {
         for (const p of data) {
-          const article = `
-            <article>
-            <div class="title_box">
-            <h2>${p.name}</h2>
-            <div class="price_by_night">$${p.price_by_night}</div>
-            </div>
-            <div class="information">
-            <div class="max_guest">${p.max_guest} Guest</div>
-            <div class="number_rooms">${p.number_rooms} Bedroom</div>
-            <div class="number_bathrooms">${p.number_bathrooms} Bathroom</div>
-            </div>
-            <div class="description">${p.description}</div>
-            </article>`;
-          $('section.places').append(article);
+          console.log(p);
+          const userUrl = myUrl + `/users/${p.user_id}`;
+          $.ajax({
+            url: userUrl,
+            type: 'GET',
+            success: function (u) {
+              const article = `
+               <article>
+               <div class="title_box">
+               <h2>${p.name}</h2>
+               <div class="price_by_night">$${p.price_by_night}</div>
+               </div>
+               <div class="information">
+               <div class="max_guest">${p.max_guest} Guest${p.max_guest !== 1 ? 's' : ''}</div>
+               <div class="number_rooms">${p.number_rooms} Bedroom${p.number_rooms !== 1 ? 's' : ''}</div>
+               <div class="number_bathrooms">${p.number_bathrooms} Bathroom${p.number_bathrooms !== 1 ? 's' : ''}</div>
+               </div>
+               <div class="user">
+               <b>Owner:</b> ${u.first_name} ${u.last_name}
+               </div>
+               <div class="description">${p.description}</div>
+               </article>`;
+              $('section.places').append(article);
+            },
+            error: function (err) {
+              console.log(err);
+            }
+          });
         }
       },
       error: function (err) {
@@ -71,22 +90,12 @@ $(document).ready(function () {
       }
     });
   }
-
   $('button').click(function () {
-    const selectedAmen = amenityIDs;
-    $('section.places').empty();
-
-    $.ajax({
-      url: 'http://0.0.0.0:5001/api/v1/places_search/',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ amenities: selectedAmen }),
-      success: function (data) {},
-      error: function (err) {
-        console.log(err);
-      }
-    });
+    $('section.places article').remove();
+    const selectedIds = amenityIDs.map(items => items.id);
+    getAllPlaces(selectedIds);
   });
+
   checkAPIStatus();
   getAllPlaces();
 });
