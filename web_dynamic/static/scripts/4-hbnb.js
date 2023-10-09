@@ -55,7 +55,6 @@ $(document).ready(function () {
       data: JSON.stringify(amenityIdDict),
       success: function (data) {
         for (const p of data) {
-          console.log(p);
           const userUrl = myUrl + `/users/${p.user_id}`;
           $.ajax({
             url: userUrl,
