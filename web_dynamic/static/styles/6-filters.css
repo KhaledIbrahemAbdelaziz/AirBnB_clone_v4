@@ -77,7 +77,11 @@ button:hover {
 .amenities .popover ul{
     margin: 0px;
 }
-.amenities .popover input {
+.amenities h4 {
+	white-space: nowrap;
+	overflow: visible;
+	text-overflow: ellipsis;
+	width: 10px;
 }
 
 .locations .popover {
