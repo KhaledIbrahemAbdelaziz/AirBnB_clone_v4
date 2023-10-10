@@ -137,7 +137,8 @@ $(document).ready(function () {
   });
 
   $('#toggleReviews').click(function () {
-    const $this = $(this); const reviewsList = $('.reviews ul');
+    const $this = $(this);
+    const reviewsList = $this.closest('.reviews').find('ul');
     if ($this.text() === 'show') {
       $.ajax({
         url: myUrl + `/places/${p.id}/reviews`,
@@ -157,7 +158,8 @@ $(document).ready(function () {
 : '';
             }).join('')}
             </ul>`;
-          $('section.places article').append(rev);
+          reviewsList.html(rev);
+          /*$('section.places article').append(rev);*/
           $this.text('hide');
         },
         error: function (err) {
