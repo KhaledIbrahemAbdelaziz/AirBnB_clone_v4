@@ -27,6 +27,7 @@ $(document).ready(function () {
     const amenityNames = amenityIDs.map(item => item.name);
     amenitiesHeader.html(Object.keys(amenityIDs).length === 0 ? '&nbsp;' : amenityNames.join(', '));
   });
+
   $('.locations h2 input[type="checkbox"]').change(function () {
     const stateCheckbox = $(this);
     const stateId = stateCheckbox.attr('data-id');
@@ -45,6 +46,7 @@ $(document).ready(function () {
     const sNames = stateIds.map(n => n.name);
     stateHeader.html(Object.keys(stateIds).length === 0 ? '&nbsp;' : sNames.join(', '));
   });
+
   $('.locations .city_locations input[type="checkbox"]').change(function () {
     const cityCheckbox = $(this);
     const cityId = cityCheckbox.attr('data-id');
@@ -85,46 +87,89 @@ $(document).ready(function () {
       data: JSON.stringify(amenityIdDict),
       success: function (data) {
         for (const p of data) {
-          const userUrl = myUrl + `/users/${p.user_id}`;
+          const userUrl = myUrl + '/users';
           $.ajax({
             url: userUrl,
             type: 'GET',
             success: function (u) {
-              const article = `
-               <article>
-               <div class="title_box">
-               <h2>${p.name}</h2>
-               <div class="price_by_night">$${p.price_by_night}</div>
-               </div>
-               <div class="information">
-               <div class="max_guest">${p.max_guest} Guest${p.max_guest !== 1 ? 's' : ''}</div>
-               <div class="number_rooms">${p.number_rooms} Bedroom${p.number_rooms !== 1 ? 's' : ''}</div>
-               <div class="number_bathrooms">${p.number_bathrooms} Bathroom${p.number_bathrooms !== 1 ? 's' : ''}</div>
-               </div>
-               <div class="user">
-               <b>Owner:</b> ${u.first_name} ${u.last_name}
-               </div>
-               <div class="description">${p.description}</div>
-               </article>`;
-              $('section.places').append(article);
+              $.ajax({
+                url: myUrl + `/places/${p.id}/reviews`,
+                type: 'GET',
+                success: function (r) {
+                  const article = `
+                   <article>
+                   <div class="title_box">
+                   <h2>${p.name}</h2>
+                   <div class="price_by_night">$${p.price_by_night}</div>
+                   </div>
+                   <div class="information">
+                   <div class="max_guest">${p.max_guest} Guest${p.max_guest !== 1 ? 's' : ''}</div>
+                   <div class="number_rooms">${p.number_rooms} Bedroom${p.number_rooms !== 1 ? 's' : ''}</div>
+                   <div class="number_bathrooms">${p.number_bathrooms} Bathroom${p.number_bathrooms !== 1 ? 's' : ''}</div>
+                   </div>
+                   <div class="user">
+                   <b>Owner:</b> ${u.map(it => it.id === p.user_id ? it.first_name + ' ' + it.last_name : '').join(' ')}
+                   </div>
+                   <div class="description">${p.description}</div>
+                   <div class="reviews">
+                   <h2>${r.length} Review${r.length > 1 ? 's' : ''}<span id="toggleReviews"> ${r.length > 1 ? 'show' : ''}</span></h2>
+                   </div>
+                   </article>`;
+                  $('section.places').append(article);
+                },
+                error: function (err) { console.log(err); }
+              });
             },
-            error: function (err) {
-              console.log(err);
-            }
+            error: function (err) { console.log(err); }
           });
         }
       },
-      error: function (err) {
-        console.log(err);
-      }
+      error: function (err) { console.log(err); }
     });
   }
+
   $('button').click(function () {
     $('section.places article').remove();
     const selectedIds = amenityIDs.map(items => items.id);
     const selectedCities = cityIds.map(items => items.id);
     const selectedStates = stateIds.map(items => items.id);
     getAllPlaces(selectedIds, selectedCities, selectedStates);
+  });
+
+  $('#toggleReviews').click(function () {
+    const $this = $(this);
+    const reviewsList = $this.closest('.reviews').find('ul');
+    if ($this.text() === 'show') {
+      $.ajax({
+        url: myUrl + `/places/${p.id}/reviews`,
+        type: 'GET',
+        success: function (r) {
+          const rev = `
+            <ul style="list-style: none;">
+            ${r.map(review => {
+            const user = u.find(user => user.id === review.user_id);
+            return user
+? `
+            <li>
+            <h3>From ${user.first_name} ${user.last_name}</h3>
+            <p>${review.text}</p>
+            </li>
+            `
+: '';
+            }).join('')}
+            </ul>`;
+          reviewsList.html(rev);
+          /*$('section.places article').append(rev);*/
+          $this.text('hide');
+        },
+        error: function (err) {
+          console.log(err);
+        }
+      });
+    } else {
+      reviewsList.empty();
+      $this.text('show');
+    }
   });
 
   checkAPIStatus();
