@@ -113,6 +113,19 @@ $(document).ready(function () {
                    <div class="description">${p.description}</div>
                    <div class="reviews">
                    <h2>${r.length} Review${r.length > 1 ? 's' : ''}<span id="toggleReviews"> ${r.length > 1 ? 'show' : ''}</span></h2>
+                   <ul style="list-style: none;">
+                   ${r.map(review => {
+                   const user = u.find(user => user.id === review.user_id);
+                   return user
+? `
+                   <li>
+                   <h3>From ${user.first_name} ${user.last_name}</h3>
+                   <p>${review.text}</p>
+                   </li>
+                   `
+: '';
+                   }).join('')}
+                   </ul>
                    </div>
                    </article>`;
                   $('section.places').append(article);
@@ -134,42 +147,6 @@ $(document).ready(function () {
     const selectedCities = cityIds.map(items => items.id);
     const selectedStates = stateIds.map(items => items.id);
     getAllPlaces(selectedIds, selectedCities, selectedStates);
-  });
-
-  $('#toggleReviews').click(function () {
-    const $this = $(this);
-    const reviewsList = $this.closest('.reviews').find('ul');
-    if ($this.text() === 'show') {
-      $.ajax({
-        url: myUrl + `/places/${p.id}/reviews`,
-        type: 'GET',
-        success: function (r) {
-          const rev = `
-            <ul style="list-style: none;">
-            ${r.map(review => {
-            const user = u.find(user => user.id === review.user_id);
-            return user
-? `
-            <li>
-            <h3>From ${user.first_name} ${user.last_name}</h3>
-            <p>${review.text}</p>
-            </li>
-            `
-: '';
-            }).join('')}
-            </ul>`;
-          reviewsList.html(rev);
-          /*$('section.places article').append(rev);*/
-          $this.text('hide');
-        },
-        error: function (err) {
-          console.log(err);
-        }
-      });
-    } else {
-      reviewsList.empty();
-      $this.text('show');
-    }
   });
 
   checkAPIStatus();
