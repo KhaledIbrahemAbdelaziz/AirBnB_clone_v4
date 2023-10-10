@@ -99,3 +99,17 @@
 .user {
   margin-bottom: 1.5%;
 }
+
+.reviews {
+  margin-top: 40px;
+  column-count: 2;
+  columns: 30em;
+  justify-content: center;
+  padding: 0 20px;
+  margin-top: 1%;
+  margin-bottom: 8%;
+}
+.reviews h2 {
+  font-size: 16px;
+  border-bottom: solid #DDDDDD 1px;
+}
